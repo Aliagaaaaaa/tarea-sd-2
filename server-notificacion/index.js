@@ -1,8 +1,8 @@
-const express = require('express');
-const { Kafka } = require('kafkajs');
-const nodemailer = require('nodemailer');
-const mongoose = require('mongoose');
-const Order = require('./models/order');
+import express from 'express';
+import { Kafka } from 'kafkajs';
+import mongoose from 'mongoose';
+import { Resend } from 'resend';
+import Order from './models/order';
 
 const app = express();
 const kafka = new Kafka({
@@ -11,34 +11,26 @@ const kafka = new Kafka({
 });
 const consumer = kafka.consumer({ groupId: 'group_notificaciones' });
 
+const resend = new Resend("re_TjnGzqcd_HbL4UpG5SpjGDuMWEHfWe8Dh");
+
 const uri = 'mongodb+srv://martin:aliaga@martincitop.4yvuxpp.mongodb.net/?retryWrites=true&w=majority&appName=martincitop';
 
 
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'maliagapacheco@gmail.com',
-    pass: ''
-  }
-});
-
-const enviarCorreo = (solicitud) => {
-  const mailOptions = {
-    from: 'maliagapacheco@gmail.com',
-    to: solicitud.email,
+const enviarCorreo = async (solicitud) => {
+  const { data, error } = await resend.emails.send({
+    from: "Acme <onboarding@resend.dev>",
+    to: [solicitud.email],
     subject: `Estado de tu pedido: ${solicitud.status}`,
-    text: `Tu pedido con ID ${solicitud.id} está en estado: ${solicitud.status}`
-  };
-
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log('Email enviado: ' + info.response);
-    }
+    html: `<strong>Tu pedido con ID ${solicitud.id} está en estado: ${solicitud.status}</strong>`,
   });
+
+  if (error) {
+    console.log('Error al enviar el correo:', error);
+  } else {
+    console.log('Correo enviado:', data);
+  }
 };
 
 const consumeMessages = async () => {
@@ -48,7 +40,7 @@ const consumeMessages = async () => {
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
       let solicitud = JSON.parse(message.value.toString());
-      enviarCorreo(solicitud);
+      await enviarCorreo(solicitud);
     },
   });
 };
@@ -58,3 +50,4 @@ consumeMessages().catch(console.error);
 app.listen(3001, () => {
   console.log('Servicio de Notificación corriendo en el puerto 3001');
 });
+
