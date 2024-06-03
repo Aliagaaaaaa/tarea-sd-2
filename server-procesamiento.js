@@ -9,7 +9,7 @@ const kafka = new Kafka({
 const consumer = kafka.consumer({ groupId: 'group_procesamiento' });
 const producer = kafka.producer();
 
-const uri = 'mongodb+srv://martin:aliaga@martincitop.4yvuxpp.mongodb.net/?retryWrites=true&w=majority&appName=martincitop';
+const uri = process.env.MONGO_URI;
 
 
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -32,6 +32,8 @@ const processOrder = async () => {
           messages: [{ value: JSON.stringify(order) }],
         });
         await producer.disconnect();
+
+        await new Promise((resolve) => setTimeout(resolve, 5000));
       }
     },
   });

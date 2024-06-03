@@ -2,6 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { Kafka } = require('kafkajs');
 const { Resend } = require('resend');
+const dotenv = require('dotenv');
+dotenv.config();
+
 
 const app = express();
 const kafka = new Kafka({
@@ -10,9 +13,9 @@ const kafka = new Kafka({
 });
 const consumer = kafka.consumer({ groupId: 'group_notificaciones' });
 
-const resend = new Resend("re_TjnGzqcd_HbL4UpG5SpjGDuMWEHfWe8Dh");
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-const uri = 'mongodb+srv://martin:aliaga@martincitop.4yvuxpp.mongodb.net/?retryWrites=true&w=majority&appName=martincitop';
+const uri = process.env.MONGO_URI;
 
 
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });

@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
 const Order = require('./models/order');
 const Product = require('./models/product');
+const dotenv = require('dotenv');
+dotenv.config();
 
 const app = express();
 const kafka = new Kafka({
@@ -13,7 +15,7 @@ const kafka = new Kafka({
 });
 const producer = kafka.producer();
 
-const uri = 'mongodb+srv://martin:aliaga@martincitop.4yvuxpp.mongodb.net/?retryWrites=true&w=majority&appName=martincitop';
+const uri = process.env.MONGO_URI;
 
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
