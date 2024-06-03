@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { Kafka } = require('kafkajs');
-const Resend = require('resend');
+const { Resend } = require('resend');
 
 const app = express();
 const kafka = new Kafka({
