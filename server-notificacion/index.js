@@ -1,8 +1,7 @@
-import express from 'express';
-import { Kafka } from 'kafkajs';
-import mongoose from 'mongoose';
-import { Resend } from 'resend';
-import Order from './models/order';
+const express = require('express');
+const mongoose = require('mongoose');
+const { Kafka } = require('kafkajs');
+const Resend = require('resend');
 
 const app = express();
 const kafka = new Kafka({
