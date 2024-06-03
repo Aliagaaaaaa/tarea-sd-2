@@ -3,3 +3,4 @@
 /server-procesamiento/node_modules
 /server-solicitudes/node_modules
 /server-estado/node_modules
+.env
